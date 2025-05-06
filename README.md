@@ -29,3 +29,10 @@ run_s3_img_tool.bat --dir dataset/images --profile inl_cli_user
 
 REM 5) delete an object from the bucket
 run_s3_img_tool.bat --delete 1.tif --profile inl_cli_user
+
+REM list everything in the bucket
+run_s3_img_tool.bat --list --profile inl_cli_user
+
+REM list only under imagery/
+run_s3_img_tool.bat --list imagery/ --profile inl_cli_user
+```
