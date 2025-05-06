@@ -2,26 +2,21 @@
 """
 s3_img_tool.py  –  Minimal helper for substax-production-inl / imagery/
 
-USAGE EXAMPLES
---------------
+Supported actions
+-----------------
+--put     <FILE>      upload a single .tif/.tiff/.png ➜ imagery/<basename>
+--dir     <FOLDER>    recursively upload *.tif|*.png inside folder tree ➜ imagery/<basename>
+--delete  <FILENAME>  delete imagery/<FILENAME> from the bucket
+--list    [PREFIX]    list objects (recursively) under bucket/PREFIX  (default = whole bucket)
 
-# 1. Single upload
-python s3_img_tool.py --put dataset/images/substation1/1.png --profile inl_cli_user
-
-# 2. Upload entire directory tree (flattens names)
-python s3_img_tool.py --dir dataset/images --profile inl_cli_user
-
-# 3. Delete unwanted file from bucket
-python s3_img_tool.py --delete 1.tif --profile inl_cli_user
+All uploads flatten the local path; no sub‑directories are created in S3.
 """
 from pathlib import Path
-import mimetypes
-import argparse
-import sys
+import mimetypes, argparse, sys
 import boto3
 
 BUCKET          = "substax-production-inl"
-DEST_PREFIX     = "imagery/"          # all objects land here
+DEST_PREFIX     = "imagery/"
 ALLOWED_SUFFIX  = (".tif", ".tiff", ".png")
 
 # ── helpers ────────────────────────────────────────────────────────────
@@ -32,7 +27,7 @@ def make_client(profile: str | None = None):
 def content_type(path: Path) -> str:
     return mimetypes.guess_type(str(path))[0] or "binary/octet-stream"
 
-def upload(client, local: Path, profile: str | None = None):
+def upload(client, local: Path):
     key = f"{DEST_PREFIX}{local.name}"
     client.upload_file(str(local), BUCKET, key,
                        ExtraArgs={"ContentType": content_type(local)})
@@ -48,11 +43,17 @@ def delete_obj(client, filename: str):
     client.delete_object(Bucket=BUCKET, Key=key)
     print(f"✗  deleted  s3://{BUCKET}/{key}")
 
+def list_objects(client, prefix: str):
+    paginator = client.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=BUCKET, Prefix=prefix):
+        for obj in page.get("Contents", []):
+            print(obj["Key"])
+
 # ── CLI ────────────────────────────────────────────────────────────────
 def main(argv: list[str] | None = None):
     ap = argparse.ArgumentParser(
-        description="Upload or delete imagery files in substax-production-inl/imagery/ "
-                    "(flattens path to filename).")
+        description="Upload, delete, or list imagery files in "
+                    "substax-production-inl (flattens paths on upload).")
     ap.add_argument("--profile", help="AWS CLI profile name")
 
     grp = ap.add_mutually_exclusive_group(required=True)
@@ -61,11 +62,12 @@ def main(argv: list[str] | None = None):
     grp.add_argument("--dir",    metavar="FOLDER",
                      help="Upload ALL .tif/.png inside folder (recursively)")
     grp.add_argument("--delete", metavar="FILENAME",
-                     help="Delete <FILENAME> from imagery/ (exact basename)")
+                     help="Delete imagery/<FILENAME> (basename only)")
+    grp.add_argument("--list",   nargs="?", const="", metavar="PREFIX",
+                     help="Recursively list bucket/PREFIX (default entire bucket)")
 
     args = ap.parse_args(argv)
-
-    cl = make_client(args.profile)
+    cl   = make_client(args.profile)
 
     if args.put:
         p = Path(args.put)
@@ -81,6 +83,9 @@ def main(argv: list[str] | None = None):
 
     elif args.delete:
         delete_obj(cl, args.delete)
+
+    elif args.list is not None:
+        list_objects(cl, args.list)
 
 if __name__ == "__main__":
     main()
