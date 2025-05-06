@@ -1,0 +1,2 @@
+# Only one third‑party library is needed; python ≥3.8 std‑lib covers the rest
+boto3>=1.34
