@@ -41,6 +41,6 @@ run_s3_img_tool.bat --list imagery/ --profile inl_cli_user
 | Flag | Description |
 |------|---------|
 | `--put <FILE>` | Upload one `.tif/.tiff/.png` to `imagery/<basename>` |
-| `setup_env.bat` | Creates & populates a Conda env (`s3img`) and installs `requirements.txt`. |
+| `--dir <FOLDER>` | Upload every allowed image inside the folder tree (paths flattened) |
 | `run_s3_img_tool.bat` | Activates the env and runs `s3_img_tool.py` with any CLI args. |
 | `requirements.txt` | Python dependencies (currently just `boto3`). |
