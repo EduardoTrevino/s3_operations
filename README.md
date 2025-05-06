@@ -42,5 +42,6 @@ run_s3_img_tool.bat --list imagery/ --profile inl_cli_user
 |------|---------|
 | `--put <FILE>` | Upload one `.tif/.tiff/.png` to `imagery/<basename>` |
 | `--dir <FOLDER>` | Upload every allowed image inside the folder tree (paths flattened) |
-| `run_s3_img_tool.bat` | Activates the env and runs `s3_img_tool.py` with any CLI args. |
-| `requirements.txt` | Python dependencies (currently just `boto3`). |
+| `--delete <FILENAME>` | Delete exactly `imagery/<FILENAME>` from the bucket |
+| `--list [PREFIX]` | Recursively list objects (whole bucket by default, or starting at `PREFIX`) |
+| `--list [PREFIX]` | Recursively list objects (whole bucket by default, or starting at `PREFIX`) |
