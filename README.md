@@ -1,4 +1,4 @@
-# substax‑imagery‑tools
+# S3 operations
 
 Small helper scripts for managing imagery and annotation data in the  
 **substax-production-inl** S3 bucket (Idaho National Lab).
