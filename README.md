@@ -44,4 +44,4 @@ run_s3_img_tool.bat --list imagery/ --profile inl_cli_user
 | `--dir <FOLDER>` | Upload every allowed image inside the folder tree (paths flattened) |
 | `--delete <FILENAME>` | Delete exactly `imagery/<FILENAME>` from the bucket |
 | `--list [PREFIX]` | Recursively list objects (whole bucket by default, or starting at `PREFIX`) |
-| `--list [PREFIX]` | Recursively list objects (whole bucket by default, or starting at `PREFIX`) |
+| `--profile <AWS‑profile>` | Use a specific AWS CLI credential profile (Please refer to PNNL's AWS S3 guide for profile creation/setup) |
